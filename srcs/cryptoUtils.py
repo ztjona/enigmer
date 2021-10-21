@@ -19,14 +19,14 @@ def convertPass2key(password: str, salt: str, keyLen: int = 32, ivLen: int = 16)
 
     # Your key that you can encrypt with
     saltB = bytes(salt, 'UTF-8')
-    kv = PBKDF2(password, saltB, dkLen=keyLen + ivLen) # key and vi
+    kv = PBKDF2(password, saltB, dkLen=keyLen + ivLen)  # key and vi
     key = kv[:keyLen]
     iv = kv[keyLen:]
 
     return key, iv
 
 
-def encrypt(data: bytes, key: bytes, iv:bytes) -> tuple[bytes, bytes]:
+def encrypt(data: bytes, key: bytes, iv: bytes) -> bytes:
     '''Do the encryption with the given key and data.
     Returns the bytes of the encription.
 
@@ -34,5 +34,17 @@ def encrypt(data: bytes, key: bytes, iv:bytes) -> tuple[bytes, bytes]:
 
     cipher = AES.new(key, AES.MODE_CFB, iv=iv)  # CFB mode
     ciphered_data = cipher.encrypt(data)
+
+    return ciphered_data
+
+
+def decrypt(data: bytes, key: bytes, iv: bytes) -> bytes:
+    '''Do the decryption with the given key and data.
+    Returns the bytes of the decription.
+
+    ############################################### '''
+
+    cipher = AES.new(key, AES.MODE_CFB, iv=iv)  # CFB mode
+    ciphered_data = cipher.decrypt(data)
 
     return ciphered_data

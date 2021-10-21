@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Encrypts all the files in a given directory. The encrypted files are generated in a folder called "/encrypted/"
+'''Encrypts all the files in a given directory.
 It ask for a password that is used to generate the AES key.
 The key is generated from password with PBKDF2, and salted with the date of the encription.
-
-Example:
-    python enigmer.py 'C:/Users/uuuuu/Documents/'
-
 
 
 Python 3.7.3
@@ -27,6 +23,7 @@ from srcs.filesUtils import convertFile2bytes, saveBytes, obtainPass
 
 extension = '.tzt'  # the file extension of the encripted data
 folder = './encrypted/'
+
 
 
 def print(*args, **kwargs):

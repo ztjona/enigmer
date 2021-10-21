@@ -1,0 +1,8 @@
+// To compile as exe run the following commands.
+pyinstaller.exe --onefile enigmer.py
+pyinstaller.exe --onefile decrypter.py
+
+
+// To generate dependencies
+pipreqs.exe --encoding 'UTF-8' '.'
+

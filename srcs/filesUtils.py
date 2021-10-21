@@ -10,6 +10,7 @@ Cuando escribí este código, solo dios y yo sabíamos como funcionaba. Ahora so
 '''
 
 
+from getpass import getpass
 from os import mkdir, path
 
 
@@ -26,6 +27,26 @@ def convertFile2bytes(filename: str) -> bytes:
     return dataB
 
 
+
+def isExtension(filename:str, extension:str)->tuple[bool, str]:
+    '''Returns true when the given ``filename`` is in the given ``extension``.
+    
+    ############################################### '''
+    parts = filename.split(extension)
+    if len(parts) == 2:
+        rawName, rest = parts
+        
+        if not rest:
+            # there is nothing after the extension! good.
+            return True, rawName
+        else:
+            # there is something after the extension name.
+            return False, ''
+    else:
+        return False, ''
+        
+
+
 def saveBytes(folder: str, filename: str, data: bytes):
     '''Saves the given ``data`` bytes in the ``filename`` inside the ``folder``.
 
@@ -33,9 +54,24 @@ def saveBytes(folder: str, filename: str, data: bytes):
     if not path.isdir(folder):
         mkdir(folder)
 
-    with open(folder +'/' + filename, "wb") as fileOut:
+    with open(folder + '/' + filename, "wb") as fileOut:
         fileOut.write(data)
 
+
+def obtainPass() -> str:
+    '''Returns the validated password from the user.
+    ############################################### '''
+
+    while True:
+
+        passA = getpass(prompt="Ingrese su contraseña:")
+        passB = getpass(prompt="Reingrese la misma contraseña:")
+
+        if passA == passB:
+            break
+        print('Contraseñas no coinciden. Intente nuevamente.')
+
+    return passB
 
 # convertFile2bytes('a.txt')
 # convertFile2bytes('b.JPG')
