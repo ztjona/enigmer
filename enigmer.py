@@ -50,8 +50,9 @@ def getSaltStr() -> str:
     ############################################### '''
 
     salt = datetime.now().strftime('%Y-%M-%d')
-    with open('salt.txt', 'w') as txt:
-        print(salt)
+    with open('salt.txt', 'w') as file:
+        file.write(salt)
+    print('salting is:\t\t', salt)
     return salt
 
 
@@ -76,6 +77,7 @@ def main():
     files = os.listdir(path)
     for idx, filename in enumerate(files):
         if os.path.isdir(filename):
+            print('{}/{} folder, not encrypting \t{}'.format(idx, len(files), filename))
             continue
 
         print('{}/{} Encrypting \t{}'.format(idx, len(files), filename))
