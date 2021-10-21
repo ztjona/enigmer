@@ -13,8 +13,8 @@ Cuando escribí este código, solo dios y yo sabíamos como funcionaba. Ahora so
 -Donald E. Knuth
 '''
 
+import builtins
 from datetime import datetime
-from datetime import date
 from sys import argv
 import os
 
@@ -23,8 +23,15 @@ from srcs.filesUtils import convertFile2bytes, saveBytes
 
 from getpass import getpass
 
-extension = '.tzt' # the file extension of the encripted data
-folder= './encrypted/'
+extension = '.tzt'  # the file extension of the encripted data
+folder = './encrypted/'
+
+# "decorating" print
+
+
+def print(*args, **kwargs):
+    builtins.print(datetime.now(), '::: ', *args, **kwargs)
+
 
 def obtainPass() -> str:
     '''Returns the validated password from the user.
@@ -49,7 +56,7 @@ def getSaltStr() -> str:
         '2021-10-21'
     ############################################### '''
 
-    salt = datetime.now().strftime('%Y-%M-%d')
+    salt = datetime.now().strftime('%Y-%m-%d')
     with open('salt.txt', 'w') as file:
         file.write(salt)
     print('salting is:\t\t', salt)
@@ -62,10 +69,10 @@ def main():
     # --- validating path
 
     args = argv[1:]
-    path, = args
+    srcPath, = args
 
     # --- validating the path
-    if not os.path.isdir(path):
+    if not os.path.isdir(srcPath):
         raise Exception('Input path incorrect.')
 
     # --- from password to key
@@ -74,19 +81,19 @@ def main():
     key, iv = convertPass2key(password, salt)
 
     # --- from password to key
-    files = os.listdir(path)
+    files = os.listdir(srcPath)
     for idx, filename in enumerate(files):
         if os.path.isdir(filename):
-            print('{}/{} folder, not encrypting \t{}'.format(idx, len(files), filename))
+            print('{}/{} folder, not encrypting \t{}'.format(idx,
+                                                             len(files) - 1, filename))
             continue
 
-        print('{}/{} Encrypting \t{}'.format(idx, len(files), filename))
-        
-        data = convertFile2bytes(filename)
+        print('{}/{} Encrypting \t{}'.format(idx, len(files) - 1, filename))
+
+        data = convertFile2bytes(srcPath + '/' + filename)
         cypherData = encrypt(data, key, iv)
 
-        saveBytes(folder, filename + extension, cypherData)
-
+        saveBytes(srcPath + '/'+folder, filename + extension, cypherData)
 
     return
 
