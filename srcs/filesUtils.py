@@ -69,7 +69,7 @@ def obtainPass() -> str:
 
         if passA == passB:
             break
-        print('Contraseñas no coinciden. Intente nuevamente.')
+        print('\t\tWARNING: Contraseñas no coinciden. Intente nuevamente.\n')
 
     return passB
 

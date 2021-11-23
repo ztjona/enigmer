@@ -19,8 +19,8 @@ Cuando escribí este código, solo dios y yo sabíamos como funcionaba. Ahora so
 
 import builtins
 from datetime import datetime
-from sys import argv
-import os
+from sys import argv, stderr
+from os import path, listdir
 
 from srcs.cryptoUtils import convertPass2key, encrypt
 from srcs.filesUtils import convertFile2bytes, saveBytes, obtainPass
@@ -42,22 +42,44 @@ def getSaltStr() -> str:
     ############################################### '''
 
     salt = datetime.now().strftime('%Y-%m-%d')
-    with open('salt.txt', 'w') as file:
-        file.write(salt)
+    
     print('salting is:\t\t', salt)
     return salt
+
+
+def showHelp(e:Exception):
+    '''Prints a message for help
+    ############################################### '''
+    
+    print('Error:', e, file=stderr)
+    print('''DESCRIPTION:
+    \t\tEncrypts files in given <path>.
+    \t\tThe encription requires a password, and salts it with the current date.
+    \t\tUSAGE: enigmer <path>
+    \t\tFor example:
+    \t\t> enigmer .
+    
+    ''')
+    return
 
 
 def main():
     '''
     ############################################### '''
     # --- input from command line
-    args = argv[1:]
-    srcPath, = args
+    try:
+        args = argv[1:]
+        srcPath, = args
+    except Exception as e:
+        showHelp(e)
+        exit(1)
+
 
     # --- validating the path
-    if not os.path.isdir(srcPath):
-        raise Exception('Input path incorrect.\n')
+    if not path.isdir(srcPath):
+        showHelp(Exception('path --{}-- not found.'.format(srcPath)))
+        exit(1)
+        
 
     # --- from password to key
     password = obtainPass()
@@ -65,11 +87,11 @@ def main():
     key, iv = convertPass2key(password, salt)
 
     # --- loop by file
-    files = os.listdir(srcPath)
+    files = listdir(srcPath)
     for idx, filename in enumerate(files):
 
         # ignoring folders
-        if os.path.isdir(srcPath + '/' + filename):
+        if path.isdir(srcPath + '/' + filename):
             print('{}/{} folder, not encrypting \t{}'.format(idx,
                                                              len(files) - 1, filename))
             continue
@@ -82,6 +104,11 @@ def main():
 
         saveBytes(srcPath + '/'+folder, filename + extension, cypherData)
 
+    print('Saving salt')
+    with open('salt.txt', 'w') as file:
+        file.write(salt)
+    print('Done!')
+    
     return
 
 

@@ -15,8 +15,8 @@ Cuando escribí este código, solo dios y yo sabíamos como funcionaba. Ahora so
 
 from datetime import datetime
 import builtins
-from sys import argv
-import os
+from sys import argv, stderr
+from os import path, listdir
 
 from srcs.filesUtils import obtainPass, convertFile2bytes, isExtension, saveBytes
 from srcs.cryptoUtils import convertPass2key, decrypt
@@ -31,28 +31,52 @@ def print(*args, **kwargs):
     builtins.print(datetime.now(), '::: ', *args, **kwargs)
 
 
+def showHelp(e: Exception):
+    '''Prints a message for help
+    ############################################### '''
+
+    print('Error:', e, file=stderr)
+    print('''DESCRIPTION:
+    \t\tDecrypts files, encrypted with enigmer, in given <path> with <salt>.
+    \t\tIt will request user password. It will decrypt even if <salt> or password are incorrect,
+    \t\tbut files will be corrupted.
+
+    \t\tUSAGE: decrypter <path> <salt>
+    
+    \t\tFor example:
+    \t\t> decrypter . 2021-10-21
+    
+    ''')
+    return
+
+
 def main():
     '''
     
     ############################################### '''
     # ---
-    args = argv[1:]
-    srcPath, salt = args
+    try:
+        args = argv[1:]
+        srcPath, salt = args
+    except Exception as e:
+        showHelp(e)
+        exit(1)
 
     # --- validating the path
-    if not os.path.isdir(srcPath):
-        raise Exception('Input path incorrect.')
+    if not path.isdir(srcPath):
+        showHelp(Exception('path --{}-- not found.'.format(srcPath)))
+        exit(1)
 
     # --- from password to key
     password = obtainPass()
     key, iv = convertPass2key(password, salt)
 
     # --- loop by file
-    files = os.listdir(srcPath)
+    files = listdir(srcPath)
     for idx, filename in enumerate(files):
 
         # ignoring folders
-        if os.path.isdir(srcPath + '/' + filename):
+        if path.isdir(srcPath + '/' + filename):
             print('{}/{} folder, not encrypting \t{}'.format(idx,
                                                              len(files) - 1, filename))
             continue
